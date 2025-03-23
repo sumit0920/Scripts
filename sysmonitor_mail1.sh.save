@@ -1,0 +1,86 @@
+#!/bin/bash
+
+# Thresholds
+CPU_THRESHOLD=80
+DISK_THRESHOLD=90
+
+# Email settings
+EMAIL="recipient@example.com"
+SUBJECT="System Resource Alert"
+
+# Function to check CPU usage
+check_cpu_usage() {
+    CPU_USAGE=$(top -bn1 | grep "Cpu(s)" | \
+                sed "s/.*, *\([0-9.]*\)%* id.*/\1/" | \
+                awk '{print 100 - $1}')
+    echo "Current CPU Usage: $CPU_USAGE%"
+    if (( $(echo "$CPU_USAGE > $CPU_THRESHOLD" | bc -l) )); then
+        send_email "High CPU Usage" "CPU usage is at ${CPU_USAGE}%"
+    fi
+}
+
+# Function to check disk usage
+check_disk_usage() {
+    DISK_USAGE=$(df -h / | grep -vE '^Filesystem|tmpfs|cdrom' | awk '{ print $5 }' | sed 's/%//g')
+    echo "Current Disk Usage: $DISK_USAGE%"
+    if (( DISK_USAGE > DISK_THRESHOLD )); then
+        send_email "Low Disk Space" "Disk usage is at ${DISK_USAGE}%"
+    fi
+}
+
+# Function to send email
+send_email() {
+    local SUBJECT=$1
+    local MESSAGE=$2
+    echo "$MESSAGE" | mail -s "$SUBJECT" "$EMAIL"
+}
+
+# Main loop
+while true; do
+    check_cpu_usage
+    check_disk_usage
+    sleep 60 # Check every 60 seconds
+done
+#!/bin/bash
+
+# Thresholds
+CPU_THRESHOLD=5
+DISK_THRESHOLD=5
+
+# Email settings
+EMAIL="sumitsharma.aset@gmail.com"
+SUBJECT="System Resource Alert:-Sumit"
+
+# Function to check CPU usage
+check_cpu_usage() {
+    CPU_USAGE=$(top -bn1 | grep "Cpu(s)" | \
+                sed "s/.*, *\([0-9.]*\)%* id.*/\1/" | \
+                awk '{print 100 - $1}')
+    echo "Current CPU Usage: $CPU_USAGE%"
+    if (( $(echo "$CPU_USAGE > $CPU_THRESHOLD" | bc -l) )); then
+        send_email "High CPU Usage" "CPU usage is at ${CPU_USAGE}%"
+    fi
+}
+
+# Function to check disk usage
+check_disk_usage() {
+    DISK_USAGE=$(df -h / | grep -vE '^Filesystem|tmpfs|cdrom' | awk '{ print $5 }' | sed 's/%//g')
+    echo "Current Disk Usage: $DISK_USAGE%"
+    if (( DISK_USAGE > DISK_THRESHOLD )); then
+        send_email "Low Disk Space" "Disk usage is at ${DISK_USAGE}%"
+    fi
+}
+
+# Function to send email
+send_email() {
+    local SUBJECT=$1
+    local MESSAGE=$2
+    echo "$MESSAGE" | mail -s "$SUBJECT" "$EMAIL"
+}
+
+# Main loop
+while true; do
+    check_cpu_usage
+    check_disk_usage
+    sleep 60 # Check every 60 seconds
+done
